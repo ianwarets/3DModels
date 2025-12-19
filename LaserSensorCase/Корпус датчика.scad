@@ -112,6 +112,6 @@ module block(){
     cube([outer_d, outer_d/2, height]);
 }
 
-cover();
+glass_holder();
 
 
