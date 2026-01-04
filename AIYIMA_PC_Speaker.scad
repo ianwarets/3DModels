@@ -19,29 +19,26 @@ module tweeter(){
     magnet_d = 25;
     magnet_h = 15.8;
 
-    union(){
-        //top
-        translate([0,0,-top_h])
-        cylinder(h=top_h, d=outer_d);
-        //mount hole. Hole to go trough wall.
-        hole_h = mount_h + wall_thickness;
-        translate([0,0,-(top_h+hole_h)])
-        cylinder(h=hole_h, d=mount_d);
-        //magnet
-        translate([0,0,-(top_h+mount_h+magnet_h)])
-        cylinder(h=magnet_h, d=magnet_d);
-        difference(){
-            Z(-10) sphere(d=30);
-            translate([0,0,-17]) cube(30,center=true);
-        }
-        for(g=[45:90:405]){
-            x_move = inner_d/2 + screw_mount_d/2;
-            rotate([0,0,g])
-            translate([x_move, 0, -top_h*5])
-            cylinder(d=screw_d, h=top_h*5);
-        }
+    //top
+    translate([0,0,-top_h])
+    cylinder(h=top_h, d=outer_d);
+    //mount hole. Hole to go trough wall.
+    hole_h = mount_h + wall_thickness;
+    translate([0,0,-(top_h+hole_h)])
+    cylinder(h=hole_h, d=mount_d);
+    //magnet
+    translate([0,0,-(top_h+mount_h+magnet_h)])
+    cylinder(h=magnet_h, d=magnet_d);
+    difference(){
+        Z(-10) sphere(d=30);
+        translate([0,0,-17]) cube(30,center=true);
     }
-
+    for(g=[45:90:405]){
+        x_move = inner_d/2 + screw_mount_d/2;
+        rotate([0,0,g])
+        translate([x_move, 0, -top_h*5])
+        cylinder(d=screw_d, h=top_h*5);
+    }
 }
 module woofer(){
     roundRadius = 100;
@@ -67,23 +64,22 @@ module woofer(){
     resize([diameter,diameter,1])
     polyRoundExtrude(top,-0.7,0,0,fn=20);
     //Mount ring
-    union(){
-        z1 = 3.2;
-        translate([0,0,-z1])cylinder(h= 3.2, d=diameter);
-        //Contacts
-        translate([0,71/2,-z1])cube([18, 3, 6],center=true);
-        //Basket
-        z2 = z1 + 26.25;
-        translate([0,0,-z2])cylinder(h=26.25, d=71);
-        //Magnet
-        z3 = z2+27.6;
-        translate([0,0,-z3])cylinder(h=27.6, d=67.2);
-        for(g=[45:90:405]){
-            x_move = screw_d_distance/2 + screw_mount_d/2;
-            rotate([0,0,g])
-            translate([x_move, 0, -15])
-            cylinder(d=screw_d, h=15);
-        }
+
+    z1 = 3.2;
+    translate([0,0,-z1])cylinder(h= 3.2, d=diameter);
+    //Contacts
+    translate([0,71/2,-z1])cube([18, 3, 6],center=true);
+    //Basket
+    z2 = z1 + 26.25;
+    translate([0,0,-z2])cylinder(h=26.25, d=71);
+    //Magnet
+    z3 = z2+27.6;
+    translate([0,0,-z3])cylinder(h=27.6, d=67.2);
+    for(g=[45:90:405]){
+        x_move = screw_d_distance/2 + screw_mount_d/2;
+        rotate([0,0,g])
+        translate([x_move, 0, -15])
+        cylinder(d=screw_d, h=15);
     }
 }
 module curved_port(){
@@ -160,23 +156,11 @@ module curved_port(){
 module port_hole(width = 51, heigth=10){
     wall_th = 3;
     w1 = width;
-//    cornerRadius = 0;
-//    x = width/2;
-//    y = heigth/2;
-//    points=[
-//        [-x, -y,  cornerRadius ],
-//        [x , -y , cornerRadius],
-//        [x ,  y ,  cornerRadius],
-//        [-x,  y,  cornerRadius]
-//    ];
-//    polyRoundExtrude(points,wall_thickness,0,-wall_thickness,fn=10);
-    union(){
-        translate([-(w1/2+wall_th), 0,-wall_th/2]){
-        cube([w1+2*wall_th, wall_th, heigth+2 *wall_th]);
-        translate([wall_th/2, 0, wall_th/2])
-        cube([w1+wall_th, wall_thickness, heigth+wall_th]);}
-    }
 
+    translate([-(w1/2+wall_th), 0,-wall_th/2]){
+    cube([w1+2*wall_th, wall_th, heigth+2 *wall_th]);
+    translate([wall_th/2, 0, wall_th/2])
+    cube([w1+wall_th, wall_thickness, heigth+wall_th]);}
 }
 module cable_terminal(){
     module cable_connector(){
@@ -235,9 +219,8 @@ module cable_terminal_hole(){
     translate([-h_w, -h_l, 0])
     cube([width, length, height]);
 }
-module speaker_box(w, l, h){
-    rounder = 7;
-    wall_rounder = 400;
+module speaker_body(w, l, h, corner_rounder = 7, wall_rounder = 400){
+    rounder = corner_rounder;
     half_w = w/2;
     half_l = l/2;
     sides_ext = 10;
@@ -251,23 +234,24 @@ module speaker_box(w, l, h){
     ];
     polyRoundExtrude(base, h, 0,0,fn=20);
 }
+
+module speaker_box(w, l, h, wall_thickness){
+    difference(){
+        speaker_body(w+double_w_th, l+double_w_th, h+double_w_th);
+            translate([0,wall_thickness,wall_thickness])
+            speaker_body(w, l, h, 1, 400);
+    }
+}
 port_z_offset = 1.5;
 module full_cabinet(){
-    union(){
-        difference(){
-            color("gray") difference(){
-                speaker_box(w+double_w_th, l+double_w_th, h+double_w_th);
-                translate([0,wall_thickness,wall_thickness])
-                speaker_box(w, l, h);
-            }
-            translate([0,0,h*0.85]) rotate([0,90,-90])  color("pink") tweeter();
-            translate([0, 0,h*0.41]) rotate([90,0,0]) color("pink") woofer();
-            //Добавить скругление входного отверстия.
-            translate([0,0,wall_thickness + port_z_offset])
-                port_hole();
-            translate([0, l + wall_thickness*2 , h*0.6])
-                cable_terminal_hole();
-        }
+    difference(){
+        color("gray") speaker_box(w, l, h, wall_thickness); 
+        translate([0,0,h*0.85]) rotate([0,90,-90])  color("pink") tweeter();
+        translate([0, 0,h*0.41]) rotate([90,0,0]) color("pink") woofer();
+        translate([0,0,wall_thickness + port_z_offset])
+            port_hole();
+        translate([0, l + wall_thickness*2 , h*0.6])
+            cable_terminal_hole();
     }
 }
 module cabinet_with_port_and_terminals(){
@@ -320,30 +304,33 @@ module half_box(){
 
 module front_pannel(){
     difference(){
-            full_cabinet();
-            translate([-w, wall_thickness, 0])
-            cube([2*w, l+double_w_th, h+double_w_th]);
-            front_pannel_fixation();
+        full_cabinet();
+        translate([-w, wall_thickness, 0])
+            cube([2*w, l+wall_thickness, h+double_w_th]);
+        front_pannel_fixation();
     }
 }
 
 module back_pannel(){
     difference(){
         full_cabinet();
-        translate([-w, - wall_thickness, 0])
-            cube([2*w, l+double_w_th, h+double_w_th]);
+        translate([-w, 0, 0])
+            cube([2*w, l+wall_thickness, h+double_w_th]);
         back_pannel_fixation();
     }
 }
 
 module box_without_front_and_back(){
     difference(){
-        full_cabinet();
-        front_pannel();
-        back_pannel();
+        intersection(){
+            speaker_box(w,l,h, wall_thickness);
+            translate([-w,wall_thickness, 0])
+                cube([2*w, l, h+double_w_th]);
+        }
         front_pannel_fixation();
         back_pannel_fixation();
     }
 }
-
-//box_without_front_and_back();
+//front_pannel();
+//back_pannel();
+box_without_front_and_back();
