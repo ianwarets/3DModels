@@ -1,5 +1,5 @@
 include <Round-Anything/polyround.scad>
-include <Constructive/constructive-compiled.scad>
+//include <Constructive/constructive-compiled.scad>
 $fn=100;
 w = 100;
 l=127;
@@ -30,7 +30,7 @@ module tweeter(){
     translate([0,0,-(top_h+mount_h+magnet_h)])
     cylinder(h=magnet_h, d=magnet_d);
     difference(){
-        Z(-10) sphere(d=30);
+        translate([0,0,-10]) sphere(d=30);
         translate([0,0,-17]) cube(30,center=true);
     }
     for(g=[45:90:405]){
@@ -331,6 +331,7 @@ module box_without_front_and_back(){
         back_pannel_fixation();
     }
 }
+half_box();
 //front_pannel();
 //back_pannel();
 //box_without_front_and_back();
