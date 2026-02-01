@@ -1,8 +1,9 @@
 $fn = 120;
 
-outer_d = 25;
+outer_d = 27;
 inner_d = 3;
 height = 120;
+wall_thickness = 2;
 
 cover_h = 10;
 screw_h = 7;
@@ -101,7 +102,7 @@ module main_cylinder(){
         tube(120, outer_d, inner_d);
         cylinder(h=3, d = outer_d);
         translate([0,0,97])
-        cylinder(h=27, d = outer_d -2);
+        cylinder(h=27, d = outer_d -4);
     }     
     bottom();
     translate([0,0,97])
@@ -111,7 +112,10 @@ module block(){
     translate([-outer_d/2, 0,0])
     cube([outer_d, outer_d/2, height]);
 }
-
-glass_holder();
+main_cylinder();
+translate([0,0,height+2])
+    rotate([180,0,0])
+        cover();
+//glass_holder();
 
 
