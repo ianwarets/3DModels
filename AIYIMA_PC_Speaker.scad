@@ -331,7 +331,7 @@ module box_without_front_and_back(){
         back_pannel_fixation();
     }
 }
-half_box();
+//half_box();
 //front_pannel();
 //back_pannel();
 //box_without_front_and_back();
