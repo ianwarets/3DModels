@@ -10,14 +10,44 @@ module batteries(){
         cylinder(h=66, d=18.5);
     }
 }
-module usb_charger(){
-    // usb sizes 8.34 * 2.56 mm
-    hull(){
-        cylinder(h=10, d = 2.66);
-        translate([5.64,0,0])
-        cylinder(h=10, d = 2.66);
+module button(){
+    translate([95, 20, 14])
+    #cube([15, 15, 10]);
+}
+module sensor_port(){
+    translate([119, 22, -20]){
+    rotate([0,90,0]){
+        cylinder(h=12, d = 10, center = true);
+        translate([0,0,-2.5])
+        cylinder(h=5, d = 15, center = true);
+        }
     }
-    
+}
+module usb_charger(){
+    // usb sizes 8.9 * 3.1 mm
+    //board size 17.5*28*0.9
+    //translate([
+    usb_h = 3.2;
+    usb_w = 9;
+    usb_corner_r = 2;
+    usb_coords = [
+        [0,0, usb_corner_r],
+        [8.9,0,usb_corner_r],
+        [8.9, 3.2,usb_corner_r],
+        [0, 3.2,usb_corner_r]
+    ];
+    translate([123, 25.5, 0]){
+        translate([2,0,-usb_w/2])
+        rotate([0,-90,0])
+        polyRoundExtrude(usb_coords, 20,0,0,fn=20);
+        //pcb
+        translate([-28.5,usb_h, -8.75])
+        cube([28.5, 1.3, 17.5]);
+        }
+}
+module charger_holder(){
+    translate([89.5, 27,-9.5])
+    cube([5, 3, 19]);
 }
 module display_on_board(){
     translate([0,13,0]){
@@ -63,9 +93,13 @@ module main_body(){
             translate([-10,28.5,0])
             cube([2,10,67.5],true);
             translate([10,28.5,0])
-            cube([2,10,67.5],true);         
+            cube([2,10,67.5],true);
+            charger_holder();
         }
-        #batteries();
+        batteries();
+        usb_charger();
+        button();
+        sensor_port();
         //screw holes
         translate([-117.45,12.25,-31])
             for(y=[0,62]){
@@ -130,8 +164,10 @@ module front_half_l(){
 //front_half_l();
 //front_half_r();
 //color("blue")display_on_board();
-//color("black") batteries();
-    usb_charger();
+
+    back();
+    
+
 
 // Сделать сборку через переднюю панель. Экран крепится на заднюю панель и потом сверху рамка передней части. Винты прикручивают плату экрана. Другие винты крепят переднюю панель. Если можно, то одними и теми же виннами можно крепить всё.
 // Добавить кнопку включения, разъём зарадки и разъём для подключения датчика.
