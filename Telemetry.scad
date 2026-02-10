@@ -1,7 +1,7 @@
 include <Round-Anything/polyround.scad>
 $fn=50;
 module batteries(){
-    translate([-33, 23.5,-18.8])
+    translate([-33, 25.5,-18.8])
     rotate([0,90,0]){
         cylinder(h=66, d=18.5);
         translate([-18.7, 0,0])
@@ -11,8 +11,8 @@ module batteries(){
     }
 }
 module button(){
-    translate([95, 20, 14])
-    #cube([15, 15, 10]);
+    translate([95, 25, 14])
+    cube([15, 15, 10]);
 }
 module sensor_port(){
     translate([119, 22, -20]){
@@ -79,7 +79,7 @@ module main_body(){
         union(){
             difference(){
                 rotate([-90,0,0])
-                polyRoundExtrude(body,35,0,0,fn=20);  
+                polyRoundExtrude(body,38,0,0,fn=20);  
                 translate([0,10,0])
                 cube([228.4, 40, 56.4],true);
                 display_on_board();  
@@ -89,9 +89,6 @@ module main_body(){
             partition();
             translate([-35, 22.5,0])
             partition();
-            //battery holder
-            translate([-10,28.5,0])
-            cube([2,10,67.5],true);
             translate([10,28.5,0])
             cube([2,10,67.5],true);
             charger_holder();
@@ -133,20 +130,26 @@ module half(){
             polygon(points=[[0,0],[0,10],[5,10],[5,5],[10,5],[10,0]]);
         }
 }
-module front(){       
+module front_back_splitter(){
+    translate([0,-8,0])
     difference(){
+        cube([250, 20, 72], true);
+        translate([0, 9,0])
+        cube([241.4, 2, 67.9], true);
+        }
+}
+module front(){       
+    intersection(){
         translate([0,-13,0])
         main_body();
-        translate([-200,0,-50])
-        cube([400,100,100]);
+        front_back_splitter();
     }
 }
 module back(){
     difference(){
         translate([0, -13, 0])
         main_body();
-        translate([-200,-20,-50])
-        cube([400, 20, 100]);
+        front_back_splitter();
     }
 }
 module front_half_r(){
@@ -161,12 +164,28 @@ module front_half_l(){
         half();
         }
     }
+
+module back_half_l(){
+    difference(){
+        back();
+        half();
+    }
+}
+
+module back_half_r(){
+        intersection(){
+        back();
+        half();
+    }
+}
+back();
+//front();
 //front_half_l();
 //front_half_r();
+//back_half_r();
+//back_half_l();
 //color("blue")display_on_board();
-
-    back();
-    
+   
 
 
 // Сделать сборку через переднюю панель. Экран крепится на заднюю панель и потом сверху рамка передней части. Винты прикручивают плату экрана. Другие винты крепят переднюю панель. Если можно, то одними и теми же виннами можно крепить всё.
