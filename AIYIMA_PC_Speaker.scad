@@ -92,6 +92,12 @@ module curved_port(){
     half_w2 = w2/2;
     full_l = 2*l2 + l1;
     wall_th = 3;
+    wrap_l = 50;
+    max_l = l - wall_thickness;
+    part1 = max_l - wrap_l - h/2;
+    part2= full_l - part1 -wrap_l - l2;
+
+    move = 2*wrap_l/PI;
     
     module port_edge(){
         module inout(width1, width2, length, height){
@@ -114,11 +120,10 @@ module curved_port(){
     module strait_pipe(length){
         difference(){
             cube([w2+wall_th, length, h+wall_th]);
-            translate([wall_th/2, wall_th/2, 0])
+            translate([wall_th/2, 0, wall_th/2])
             cube([w2, length, h]);
         }
     }
-    move = 2*l1/PI;
     module wrap(h=h, w2=w2, move=move){
         rotate_extrude(angle=90,convexity=10){
             translate([move, 0,0])
@@ -138,14 +143,26 @@ module curved_port(){
             wrap();
         }
     }
-    rotate([0,90,0])
-    translate([-(move+h+wall_th/2), l2,-(w2+wall_th)/2])
-    wrapped_port();
     
-    translate([0,move+l2-wall_th/2,move+l2+h+wall_th/2])
-    rotate([-90,0,0])
+    translate([0,part1+l2, 0]){    
+        rotate([0,90,0])
+        translate([-(move+h+wall_th/2), 0,-(w2+wall_th)/2])
+        wrapped_port();
+        
+        translate([-half_w2-wall_th/2,move-wall_th/2,move+h+wall_th/2+part2])
+        rotate([-90,0,0])
+        strait_pipe(part2);
+        //Second pipe edge
+        translate([0,move-wall_th/2,move+l2+h+wall_th/2 + part2])
+        rotate([-90,0,0])
+        port_edge();
+    }
+    translate([-(half_w2+wall_th/2), l2, 0])
+    strait_pipe(part1);
+    
+    //First pipe edge
     port_edge();
-    port_edge();
+    //Front of the port
     translate([-(w1/2+wall_th), 0,-wall_th/2])
     difference(){
         cube([w1+2*wall_th, wall_th, h+2 *wall_th]);
@@ -242,7 +259,7 @@ module speaker_box(w, l, h, wall_thickness){
             speaker_body(w, l, h, 1, 400);
     }
 }
-port_z_offset = 1.5;
+port_z_offset = 0;
 module full_cabinet(){
     difference(){
         color("gray") speaker_box(w, l, h, wall_thickness); 
@@ -331,8 +348,9 @@ module box_without_front_and_back(){
         back_pannel_fixation();
     }
 }
-//half_box();
+half_box();
 //front_pannel();
 //back_pannel();
 //box_without_front_and_back();
-cable_terminal();
+//cable_terminal();
+//curved_port();
