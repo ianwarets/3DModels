@@ -10,14 +10,19 @@ module batteries(){
         cylinder(h=66, d=18.5);
     }
 }
-module button(){
-    translate([95, 25, 14])
-    cube([15, 15, 10]);
+module button(){    
+    translate([100, 28.5, 20]){
+        cube([20, 11, 13], true);
+        translate([0,7.5,0])
+        cube([21.5,4,15.5], true);
+    }
 }
 module sensor_port(){
     translate([119, 22, -20]){
     rotate([0,90,0]){
         cylinder(h=12, d = 10, center = true);
+        translate([0,0,5])
+        cylinder(h=2, d = 12, center = true);
         translate([0,0,-2.5])
         cylinder(h=5, d = 15, center = true);
         }
@@ -178,14 +183,14 @@ module back_half_r(){
         half();
     }
 }
-back();
+//back();
 //front();
 //front_half_l();
 //front_half_r();
-//back_half_r();
+back_half_r();
 //back_half_l();
 //color("blue")display_on_board();
-   
+
 
 
 // Сделать сборку через переднюю панель. Экран крепится на заднюю панель и потом сверху рамка передней части. Винты прикручивают плату экрана. Другие винты крепят переднюю панель. Если можно, то одними и теми же виннами можно крепить всё.
