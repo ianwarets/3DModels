@@ -9,7 +9,7 @@ double_w_th = wall_thickness * 2;
 
 module tweeter(){
     outer_d = 52;
-    inner_d = 40;
+    inner_d = 38.5;
     top_h = 2.9;
     outer_r = outer_d/2;
     screw_mount_d = 5.5;
@@ -68,7 +68,7 @@ module woofer(){
     z1 = 3.2;
     translate([0,0,-z1])cylinder(h= 3.2, d=diameter);
     //Contacts
-    translate([0,71/2,-z1])cube([18, 3, 6],center=true);
+    translate([0,70/2,-z1+2.5-7.5])cube([27, 4.3, 5],center=true);
     //Basket
     z2 = z1 + 26.25;
     translate([0,0,-z2])cylinder(h=26.25, d=71);
@@ -93,7 +93,7 @@ module curved_port(){
     full_l = 2*l2 + l1;
     wall_th = 3;
     wrap_l = 50;
-    max_l = l - wall_thickness;
+    max_l = l - wall_thickness - 0.5;
     part1 = max_l - wrap_l - h/2;
     part2= full_l - part1 -wrap_l - l2;
 
@@ -170,7 +170,7 @@ module curved_port(){
         cube([w1, wall_th, h]);
     }
 }
-module port_hole(width = 51, heigth=10){
+module port_hole(width = 51.4, heigth=10.4){
     wall_th = 3;
     w1 = width;
 
@@ -211,7 +211,7 @@ module cable_terminal(){
         polyRoundExtrude(box, height, radius, radius, $fn=20);
     
         rotate([180,0,0])
-            translate([0,0,-18.5]){       
+            translate([0,3,-18.5]){       
             translate([8,0,0])
             cable_connector();
             translate([-8,0,0])
@@ -267,7 +267,7 @@ module full_cabinet(){
         translate([0, 0,h*0.41]) rotate([90,0,0]) color("pink") woofer();
         translate([0,0,wall_thickness + port_z_offset])
             port_hole();
-        translate([0, l + wall_thickness*2 , h*0.6])
+        translate([0, l + wall_thickness*2 , h*0.7])
             cable_terminal_hole();
     }
 }
@@ -335,6 +335,8 @@ module back_pannel(){
             cube([2*w, l+wall_thickness, h+double_w_th]);
         back_pannel_fixation();
     }
+    translate([0, l + wall_thickness*2 , h*0.7])
+            cable_terminal();
 }
 
 module box_without_front_and_back(){
@@ -348,9 +350,10 @@ module box_without_front_and_back(){
         back_pannel_fixation();
     }
 }
-half_box();
+//half_box();
 //front_pannel();
 //back_pannel();
 //box_without_front_and_back();
 //cable_terminal();
-//curved_port();
+//translate([0,0,wall_thickness + port_z_offset]) curved_port();
+cylinder(h = 4.8, d = 4.8);

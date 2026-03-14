@@ -1,5 +1,7 @@
 include <Round-Anything/polyround.scad>
 $fn=50;
+width = 255;
+height = 74;
 module batteries(){
     translate([-33, 25.5,-18.8])
     rotate([0,90,0]){
@@ -11,20 +13,22 @@ module batteries(){
     }
 }
 module button(){    
-    translate([100, 28.5, 20]){
-        cube([20, 11, 13], true);
+    translate([100, 29.5, 20]){
+        cube([19.5, 11, 13], true);
         translate([0,7.5,0])
         cube([21.5,4,15.5], true);
+        translate([0,-1.5,0])
+        cube([21.5, 10, 15.5], true);
     }
 }
 module sensor_port(){
-    translate([119, 22, -20]){
-    rotate([0,90,0]){
-        cylinder(h=12, d = 10, center = true);
-        translate([0,0,5])
-        cylinder(h=2, d = 12, center = true);
-        translate([0,0,-2.5])
-        cylinder(h=5, d = 15, center = true);
+    translate([100, 28, -18]){
+    rotate([0,90,90]){
+        cylinder(h=12, d = 12, center = true);
+        translate([0,0,7.8])
+        cylinder(h=7, d = 20, center = true);
+        translate([0,0,1])
+        cylinder(h=1, d = 19, center = true);
         }
     }
 }
@@ -41,17 +45,44 @@ module usb_charger(){
         [8.9, 3.2,usb_corner_r],
         [0, 3.2,usb_corner_r]
     ];
-    translate([123, 25.5, 0]){
-        translate([2,0,-usb_w/2])
+    x = width/2 - 2.5;
+    y = height/2 - 11.5;
+    translate([x, y, 0]){
+        translate([2.5,0,-usb_w/2])
         rotate([0,-90,0])
-        polyRoundExtrude(usb_coords, 20,0,0,fn=20);
+        polyRoundExtrude(usb_coords, 9.5,0,0,fn=20);
         //pcb
         translate([-28.5,usb_h, -8.75])
         cube([28.5, 1.3, 17.5]);
+        translate([-16, -2.5, -8.75])
+        cube([15, 6, 17.6]);
+        translate([-28.5, usb_h, -8.75])
+        cube([5, 3, 17.6]);
         }
 }
+
+module charger_indicators(){
+    diam = 3.4;
+    h = 4;
+    x = width/2 - 4;
+    y = height/2 - 16.5;
+    translate([x, y, 2.5])
+    rotate([0,90,0]){
+        cylinder(h=h, d = diam);
+        translate([0,0,-10])
+        cylinder(h=10, d = 4.2);
+        translate([5,0,0]){
+            cylinder(h=h, d = diam);
+            translate([0,0,-10])
+            cylinder(h=10, d = 4.2);
+        }
+    }
+}
+
 module charger_holder(){
-    translate([89.5, 27,-9.5])
+    x = width/2 - 36;
+    y = height/2 - 10;
+    translate([x, y,-9.5])
     cube([5, 3, 19]);
 }
 module display_on_board(){
@@ -71,8 +102,8 @@ module partition(){
     cube([2,15,67.5], true);
 }
 module main_body(){
-    corner_x = 125;
-    corner_y = 36;
+    corner_x = width/2;
+    corner_y = height/2;
     corner_radius = 2;
     body=[
             [-corner_x, -corner_y,  corner_radius ],
@@ -100,18 +131,20 @@ module main_body(){
         }
         batteries();
         usb_charger();
+        charger_indicators();
         button();
         sensor_port();
         //screw holes
-        translate([-117.45,12.25,-31])
-            for(y=[0,62]){
+        y_max = height - 9;
+        translate([-117.45,12.25,-y_max/2])
+            for(y=[0,65]){
                     for(x=[0:78.3:243.9]){
                         translate([x, 0, y])
                         rotate([90,0,0])
-                        cylinder(7, d=3.5, true);
-                        translate([x, -7, y])
+                        cylinder(12, d=3.5, true);
+                        translate([x, -9.25, y])
                         rotate([90,0,0])
-                        cylinder(7, d=5, true);
+                        cylinder(3, d=5, true);
                         translate([x, 15, y])
                         rotate([90,0,0])
                         cylinder(15, d=2.7, true);
@@ -121,24 +154,10 @@ module main_body(){
     
 }
 
-module half(){
-    union(){
-            translate([0,-30,-50])
-            cube([200,100,100]);
-            translate([0, 80, -36])
-            rotate([0,-90,90])
-            linear_extrude(height = 100)
-            polygon(points=[[0,0],[0,10],[5,10],[5,5],[10,5],[10,0]]);
-            translate([0, 80, 26])
-            rotate([0,-90,90])
-            linear_extrude(height = 100)
-            polygon(points=[[0,0],[0,10],[5,10],[5,5],[10,5],[10,0]]);
-        }
-}
 module front_back_splitter(){
     translate([0,-8,0])
     difference(){
-        cube([250, 20, 72], true);
+        cube([width, 20, height], true);
         translate([0, 9,0])
         cube([241.4, 2, 67.9], true);
         }
@@ -154,45 +173,15 @@ module back(){
     difference(){
         translate([0, -13, 0])
         main_body();
+        //resize([250.5,20,74.5])
+        scale([1.002,1, 1.006])
         front_back_splitter();
     }
 }
-module front_half_r(){
-    intersection(){
-        front();
-        half();
-    }
-}
-module front_half_l(){
-    difference(){
-        front();
-        half();
-        }
-    }
-
-module back_half_l(){
-    difference(){
-        back();
-        half();
-    }
-}
-
-module back_half_r(){
-        intersection(){
-        back();
-        half();
-    }
-}
-//back();
+back();
 //front();
-//front_half_l();
-//front_half_r();
-back_half_r();
-//back_half_l();
-//color("blue")display_on_board();
 
-
-
-// Сделать сборку через переднюю панель. Экран крепится на заднюю панель и потом сверху рамка передней части. Винты прикручивают плату экрана. Другие винты крепят переднюю панель. Если можно, то одними и теми же виннами можно крепить всё.
-// Добавить кнопку включения, разъём зарадки и разъём для подключения датчика.
-
+translate([-54,25,-27])
+rotate([90,0,180])
+linear_extrude(1.5)
+text("Окунев", size = 13, language="ru", font="Gaudi");
