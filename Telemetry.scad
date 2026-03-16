@@ -1,6 +1,6 @@
 include <Round-Anything/polyround.scad>
 $fn=50;
-width = 255;
+width = 248;
 height = 74;
 module batteries(){
     translate([-33, 25.5,-18.8])
@@ -118,15 +118,13 @@ module main_body(){
                 polyRoundExtrude(body,38,0,0,fn=20);  
                 translate([0,10,0])
                 cube([228.4, 40, 56.4],true);
-                display_on_board();  
+                display_on_board();
             }
             //Intersections
             translate([35, 22.5,0])
             partition();
             translate([-35, 22.5,0])
             partition();
-            translate([10,28.5,0])
-            cube([2,10,67.5],true);
             charger_holder();
         }
         batteries();
@@ -137,19 +135,20 @@ module main_body(){
         //screw holes
         y_max = height - 9;
         translate([-117.45,12.25,-y_max/2])
-            for(y=[0,65]){
-                    for(x=[0:78.3:243.9]){
-                        translate([x, 0, y])
-                        rotate([90,0,0])
-                        cylinder(12, d=3.5, true);
-                        translate([x, -9.25, y])
-                        rotate([90,0,0])
-                        cylinder(3, d=5, true);
-                        translate([x, 15, y])
-                        rotate([90,0,0])
-                        cylinder(15, d=2.7, true);
-                    }
-                }
+        for(y=[0,65]){
+            for(x=[0:78.3:243.9]){
+                translate([x, 0, y])
+                rotate([90,0,0])
+                cylinder(12, d=3.5, true);
+                translate([x, -9.25, y])
+                rotate([90,0,0])
+                cylinder(3, d=5, true);
+                translate([x, 15, y])
+                rotate([90,0,0])
+                cylinder(15, d=2.7, true);
+            }
+        }
+        
     }
     
 }
@@ -176,12 +175,12 @@ module back(){
         //resize([250.5,20,74.5])
         scale([1.002,1, 1.006])
         front_back_splitter();
+        translate([-54,23.5,-27])
+        rotate([90,0,180])
+        linear_extrude(1.5)
+        text("Окунев", size = 13, language="ru", font="Gaudi");
     }
 }
-back();
-//front();
-
-translate([-54,25,-27])
-rotate([90,0,180])
-linear_extrude(1.5)
-text("Окунев", size = 13, language="ru", font="Gaudi");
+//back();
+front();
+ 
