@@ -91,8 +91,10 @@ module display_on_board(){
         translate([0,-5.75,0])
         cube([229.4, 11.5, 56.4],true);
         //board
-        translate([0,-0.75,0])
-        cube([241.4, 1.65, 67.9], true);
+        pcb_thickness = 1.5;
+        
+        translate([0,pcb_thickness/2,0])
+        cube([241.4, pcb_thickness + 0.15, 67.9], true);
         //cables
         translate([-122.5,-3.5,-17.5])
         cube([10,15,35]);
@@ -118,7 +120,7 @@ module main_body(){
                 polyRoundExtrude(body,38,0,0,fn=20);  
                 translate([0,10,0])
                 cube([228.4, 40, 56.4],true);
-                display_on_board();
+                #display_on_board();
             }
             //Intersections
             translate([35, 22.5,0])
