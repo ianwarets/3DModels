@@ -103,6 +103,11 @@ module display_on_board(){
 module partition(){
     cube([2,15,67.5], true);
 }
+module nut_for_tripod(){
+    cylinder(h=0.3, d = 8);
+    translate([0,0,0.3])
+    cylinder(h=5.8, d = 7.5);
+}
 module main_body(){
     corner_x = width/2;
     corner_y = height/2;
@@ -120,7 +125,7 @@ module main_body(){
                 polyRoundExtrude(body,38,0,0,fn=20);  
                 translate([0,10,0])
                 cube([228.4, 40, 56.4],true);
-                #display_on_board();
+                display_on_board();
             }
             //Intersections
             translate([35, 22.5,0])
@@ -134,6 +139,8 @@ module main_body(){
         charger_indicators();
         button();
         sensor_port();
+        translate([0,25,-height/2])
+        #nut_for_tripod();
         //screw holes
         y_max = height - 9;
         translate([-117.45,12.25,-y_max/2])
@@ -183,6 +190,6 @@ module back(){
         text("Окунев", size = 13, language="ru", font="Gaudi");
     }
 }
-//back();
-front();
+back();
+//front();
  
