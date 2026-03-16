@@ -1,2 +1,4 @@
 *.stl
-*\*.stl
+**/*.stl
+*.gcode
+**/*.gcode
