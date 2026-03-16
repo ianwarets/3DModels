@@ -86,7 +86,7 @@ module charger_holder(){
     cube([5, 3, 19]);
 }
 module display_on_board(){
-    translate([0,13,0]){
+    translate([0,11.5,0]){
         //display modules
         translate([0,-5.75,0])
         cube([229.4, 11.5, 56.4],true);
@@ -94,7 +94,7 @@ module display_on_board(){
         pcb_thickness = 1.5;
         
         translate([0,pcb_thickness/2,0])
-        cube([241.4, pcb_thickness + 0.15, 67.9], true);
+        cube([241.4, pcb_thickness, 67.9], true);
         //cables
         translate([-122.5,-3.5,-17.5])
         cube([10,15,35]);
@@ -140,7 +140,7 @@ module main_body(){
         button();
         sensor_port();
         translate([0,25,-height/2])
-        #nut_for_tripod();
+        nut_for_tripod();
         //screw holes
         y_max = height - 9;
         translate([-117.45,12.25,-y_max/2])
@@ -190,6 +190,7 @@ module back(){
         text("Окунев", size = 13, language="ru", font="Gaudi");
     }
 }
+translate([0, 20,0])
 back();
-//front();
- 
+front();
+ //main_body();
