@@ -15,6 +15,9 @@ screw_head_h = 1;
 //screws translate
 tr =cube_w/2 - wall_thickness - 1.85*screw_d;
 
+//cable
+cable_d = 4.5;
+
 module basic_rect(width, height){
     corner = width/2;
     cornerRadius = 4;
@@ -47,7 +50,7 @@ module main_case(){
         cylinder(h=1.6, d=10);
         cylinder(h=height, d=3);
         //sensor filter
-        #translate([0,0,1.6 + 0.6])
+        translate([0,0,1.6 + 0.6])
         cylinder(h=1.2, d=8.2, center = true);
         //screw_holes
         translate([tr, tr, height - hght])
@@ -68,7 +71,7 @@ module case_cover(){
                     //cap top
                     basic_rect(cube_w, wall_thickness);
                     //cable hole
-                    cylinder(h=wall_thickness, d=3.7);
+                    cylinder(h=wall_thickness, d=cable_d + 0.2);
                 }
                 translate([0,0,-cover_h])
                 cover_flange(cover_h, cover_h);
@@ -122,9 +125,9 @@ module sensor_holder(){
                 translate([6.5,10,sensor_section_h-2.5])
                 rotate([55,0,0])
                 hull(){
-                    cylinder(h=10, d=3.6);
+                    cylinder(h=10, d=cable_d + 0.1);
                     translate([0, -3,0])
-                    cylinder(h=10, d=3.6);
+                    cylinder(h=10, d=cable_d + 0.1);
                 }
             }
         }
@@ -139,7 +142,7 @@ module glass_holder(){
     }
 }
 
-difference(){
+*difference(){
     union(){
         main_case();
         //color("pink") case_cover();
@@ -152,7 +155,7 @@ difference(){
     color("pink") case_cover();
     //cube([40, 40, 120]);
 }
-*scale([0.97,0.97,1])
-*sensor_holder();
+scale([0.97,0.97,1])
+sensor_holder();
 *scale([0.995,0.995, 0.995])
 glass_holder();
