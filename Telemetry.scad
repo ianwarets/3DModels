@@ -2,6 +2,7 @@ include <Round-Anything/polyround.scad>
 $fn=50;
 width = 248;
 height = 74;
+pcb_thickness = 2;
 module batteries(){
     translate([-33, 25.5,-18.8])
     rotate([0,90,0]){
@@ -91,7 +92,6 @@ module display_on_board(){
         translate([0,-5.75,0])
         cube([229.4, 11.5, 56.4],true);
         //board
-        pcb_thickness = 1.5;
         
         translate([0,pcb_thickness/2,0])
         cube([241.4, pcb_thickness, 67.9], true);
@@ -101,12 +101,18 @@ module display_on_board(){
     }
 }
 module partition(){
-    cube([2,15,67.5], true);
+    difference(){
+        cube([2,15,67.5], true);
+        translate([0,-5, 9.25])
+        cube([2, 5, 2], true);
+        translate([0,-5, -9.25])
+        cube([2, 5, 2], true);
+    }
 }
 module nut_for_tripod(){
     cylinder(h=0.3, d = 8);
     translate([0,0,0.3])
-    cylinder(h=5.8, d = 7.5);
+    cylinder(h=6, d = 7.3);
 }
 module main_body(){
     corner_x = width/2;
@@ -125,6 +131,7 @@ module main_body(){
                 polyRoundExtrude(body,38,0,0,fn=20);  
                 translate([0,10,0])
                 cube([228.4, 40, 56.4],true);
+                translate([0,-(pcb_thickness - 1.5),0])
                 display_on_board();
             }
             //Intersections
