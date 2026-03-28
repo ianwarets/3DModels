@@ -56,8 +56,13 @@ module basic(top_r, bottom_r, thickness){
             
            // Скруглить свод, чтоб не было поддержки в этом месте.
             rotate([10, 0,0])
-            translate([-bottom_r, -bottom_r, -5])
-            cube([2*bottom_r, bottom_r/4, h]);
+            translate([0, 0, -5])
+            #difference(){
+                cylinder(h = h, r = bottom_r, center = true);
+                translate([0, 10, 0])
+                cylinder(h = h ,r = bottom_r - 10, center = true); 
+            }
+            //cube([2*bottom_r, bottom_r/4, h]);
             }
         }
     }
@@ -91,7 +96,6 @@ module woofer_screws(width = 83){
     half_width = width/2;
     for(i = [0:3]){
             grad = 45 + 90 * i;
-            echo("grad: ", grad);
             pos_x = sin(grad) * half_width;
             pos_y = cos(grad) * half_width;
             translate([pos_x, pos_y, 0]){
@@ -146,17 +150,17 @@ module tweeter_holder(thickness, holes = true){
         if(holes){
             for(z=[45:90:315]){
                 rotate([0,0,z])
-                translate([0,25,z_move])
-                #cylinder(h = thickness, d = 4);
+                translate([0,28,z_move])
+                cylinder(h = thickness, d = 4);
             }
         }
     }
     
 }
 module tweeter_screws_holes(thickness){
-    for(z=[45:90:315]){
+    #for(z=[45:90:315]){
         rotate([0,0,z])
-        translate([0,25,0]){
+        translate([0,28,0]){
             cylinder(h = 2.6, d1 = 8.2, d2=4);
             translate([0,0,2])
             cylinder(h = thickness, d = 3.6);
@@ -248,9 +252,9 @@ module main_case(){
         button(-bot_r+thickness, 0, 33);
         power_cord_input(-bot_r+thickness+1, 0,55);
     }
-    *translate([0,35,110])
+    translate([0,35,110])
         rotate([100, 0,0])
-    tweeter_holder(thickness, true);
+    //tweeter_holder(thickness, true);
     //Power supply
     *translate([57.5,-40,60])
     rotate([0,80,90])
@@ -259,10 +263,10 @@ module main_case(){
 module front_pannel(){
     circle_h = 4.5;
     module tweeter_circle(){
-        outer_d = 38.5;
+        outer_d = 42;
         d1= (60-outer_d)/2 + 5;
         R = outer_d/2 + d1/2;
-        translate([0,38.65,110])
+        translate([0,38.6,110.6])
         rotate([100,0,0]) 
         difference(){
             rotate_extrude(360, 2){
@@ -336,7 +340,7 @@ difference(){
             round_port(20, D, 90);
         //front_pannel();
     }
-    *translate([0,-100,-90])
+    translate([0,-100,-90])
     cube([100,200,250]);
 }
 //front_pannel();
