@@ -10,8 +10,7 @@ module basic(top_r, bottom_r, thickness){
             sphere(r = s_top_r);
             sphere(r = s_bottom_r);
             }
-
-            translate([0, bottom_r/1.2-thickness, s_bottom_r/2])
+            translate([0, bottom_r/1.2-thickness*cos(10), s_bottom_r/2])
             rotate([10,0,0])
             cube([bottom_r*2, 40, (bottom_r + top_r)*2], center = true);
         } 
@@ -55,11 +54,12 @@ module basic(top_r, bottom_r, thickness){
             edges(2*top_r, 2*top_r, h);
             
            // Скруглить свод, чтоб не было поддержки в этом месте.
-            rotate([10, 0,0])
-            translate([0, 0, -5])
-            #difference(){
+            *rotate([10, 0,0])
+            translate([0, 0, 24])
+            difference(){
                 cylinder(h = h, r = bottom_r, center = true);
-                translate([0, 10, 0])
+                translate([0, 30, 0])
+                scale([0.8,1.2,1])
                 cylinder(h = h ,r = bottom_r - 10, center = true); 
             }
             //cube([2*bottom_r, bottom_r/4, h]);
@@ -141,11 +141,11 @@ module tweeter(){
     }
 }
 module tweeter_holder(thickness, holes = true){
-    h = thickness - 3;
-    z_move = -3.6;
+    h = thickness - 4;
+    z_move = -2.5;
     difference(){
         translate([0,0,z_move])
-        cylinder(h=h, d = 60);
+        cylinder(h=h, d = 50);
         tweeter();//holes for screws in box
         if(holes){
             for(z=[45:90:315]){
@@ -157,15 +157,17 @@ module tweeter_holder(thickness, holes = true){
     }
     
 }
-module tweeter_screws_holes(thickness){
-    #for(z=[45:90:315]){
+module tweeter_screws_holes(thickness, only_cylinder = false){
+    for(z=[45:90:315]){
         rotate([0,0,z])
         translate([0,28,0]){
-            cylinder(h = 2.6, d1 = 8.2, d2=4);
             translate([0,0,2])
-            cylinder(h = thickness, d = 3.6);
-            translate([0,0,-4])
+                cylinder(h = thickness, d = 3.6);
+            if(!only_cylinder){
+            cylinder(h = 2.6, d1 = 8.2, d2=4);
+                translate([0,0,-4])
                 cylinder(h=4, d = 8.2);
+            }
         }            
     }
 }
@@ -233,13 +235,13 @@ module main_case(){
     top_r = 60;
     difference(){
         basic(top_r, bot_r, thickness);
-        translate([0,35,110])
+        translate([0,36,110])
         rotate([100, 0,0]){
             tweeter();
-            translate([0,0,-4])
-            tweeter_screws_holes(thickness);
+            translate([0,0,-6])
+            tweeter_screws_holes(thickness+2, true);
             hull()
-            #tweeter_holder(thickness, false);
+            tweeter_holder(thickness, false);
             
         }
         translate([0, 54, 25])
@@ -252,21 +254,21 @@ module main_case(){
         button(-bot_r+thickness, 0, 33);
         power_cord_input(-bot_r+thickness+1, 0,55);
     }
-    translate([0,35,110])
+    *translate([0,36,110])
         rotate([100, 0,0])
-    //tweeter_holder(thickness, true);
+    tweeter_holder(thickness, true);
     //Power supply
-    *translate([57.5,-40,60])
+    *translate([57.5,-40,50])
     rotate([0,80,90])
     cube([66, 115, 36]);
 }
 module front_pannel(){
     circle_h = 4.5;
     module tweeter_circle(){
-        outer_d = 42;
+        outer_d = 40;
         d1= (60-outer_d)/2 + 5;
         R = outer_d/2 + d1/2;
-        translate([0,38.6,110.6])
+        translate([0,38.6,110.5])
         rotate([100,0,0]) 
         difference(){
             rotate_extrude(360, 2){
@@ -278,7 +280,7 @@ module front_pannel(){
                             square([d1, d1/2]);
                     }
             }
-            translate([0,0,-2.3])
+            translate([0,0,-3.4])
             tweeter_screws_holes(10);
         }
     }
@@ -338,9 +340,9 @@ difference(){
         *translate([0,64.6,-37])
             rotate([100,0,0])
             round_port(20, D, 90);
-        //front_pannel();
+        *front_pannel();
     }
-    translate([0,-100,-90])
+    *translate([0,-100,-90])
     cube([100,200,250]);
 }
 //front_pannel();
