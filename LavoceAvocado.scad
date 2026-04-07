@@ -142,7 +142,7 @@ module tweeter(){
 }
 module tweeter_holder(thickness, holes = true){
     h = thickness - 4;
-    z_move = -2.5;
+    z_move = -2.6;
     difference(){
         translate([0,0,z_move])
         cylinder(h=h, d = 50);
@@ -170,6 +170,23 @@ module tweeter_screws_holes(thickness, only_cylinder = false){
             }
         }            
     }
+}
+module round_port_curved(d, D, l, straight_l, angle){
+    x_factor = D/d;
+    wrap_l = l - straight_l;
+    move = (180/angle)*wrap_l/PI;
+    translate([0,move, straight_l])
+    rotate([90,0,0])
+    rotate([0,-90,0])
+    rotate_extrude(angle = angle, convexity = 10)
+    translate([move,0,0])
+    difference(){
+        resize([d+3, D+3, 0])
+        circle(d = d);
+        resize([d, D, 0])
+        circle(d = d);
+    }
+    round_port(d, D, straight_l);
 }
 module round_port(d, D, l){
     x_factor = D/d;
@@ -246,13 +263,14 @@ module main_case(){
         }
         translate([0, 54, 25])
         rotate([100,0,0])
+        rotate([0,0,180])
         woofer();
         translate([0,64.6,-37])
         rotate([100, 0, 0])
         port_hole(20, 45, thickness);
         terminals(bot_r-thickness, 0, 0);
-        button(-bot_r+thickness, 0, 33);
-        power_cord_input(-bot_r+thickness+1, 0,55);
+        //button(-bot_r+thickness, 0, 33);
+        //power_cord_input(-bot_r+thickness+1, 0,55);
     }
     *translate([0,36,110])
         rotate([100, 0,0])
@@ -264,6 +282,24 @@ module main_case(){
 }
 module front_pannel(){
     circle_h = 4.5;
+
+    module revolve_text(radius, chars, font_size, step_angle) {
+        circumference = 2 * PI * radius;
+        chars_len = len(chars);
+        //font_size = circumference / chars_len;
+        //step_angle = 360 / chars_len;
+        for(i = [0 : chars_len - 1]) {
+            rotate(-i * step_angle) 
+                translate([0, radius + font_size / 2, 0]) 
+                    text(
+                        chars[i], 
+                        font = "Century Gothic", 
+                        size = font_size, 
+                        valign = "center", halign = "center"
+                    );
+        }
+    }
+    
     module tweeter_circle(){
         outer_d = 40;
         d1= (60-outer_d)/2 + 5;
@@ -301,6 +337,13 @@ module front_pannel(){
             }
             translate([0,0,-2])
             woofer_screws();
+            translate([0,0,-4.5])
+            *linear_extrude(height = 2){
+            rotate([180,0,-21])
+            revolve_text(73/2+1.5, "ЭЛЕКТРОНИКА", 7, 11);
+            rotate([180,0,135])
+            revolve_text(73/2+1.5, "ОКУНЕВА", 7, 11);
+            }
         }
     }
     tweeter_circle();
@@ -313,21 +356,10 @@ d2 = d*d;
 d1 = 20;
 D = d2/d1;
 *difference(){
-#round_port(d1,D, 80);
+#round_port(d1,D, 95);
 port_hole(d1, D, 10);
 }
 
-//translate([0,0,57])
-//rotate([-100,0,0])
-//tweeter();
-//tweeter_holder(10, true);
-
-*intersection(){
-    main_case();
-    translate([0,64.6,-37])
-        rotate([100,0,0])
-    round_port(d1,D, 90);
-}
 difference(){
     union(){
         main_case();
@@ -339,10 +371,11 @@ difference(){
         D = d2/d1;
         *translate([0,64.6,-37])
             rotate([100,0,0])
-            round_port(20, D, 90);
+            round_port_curved(20, D, 105, 10, angle=40);
         *front_pannel();
     }
     *translate([0,-100,-90])
     cube([100,200,250]);
 }
 //front_pannel();
+//round_port_curved(20, D, 105, 10, angle=40);
