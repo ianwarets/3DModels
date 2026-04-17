@@ -74,12 +74,12 @@ module basic(top_r, bottom_r, thickness){
             edges(2*bottom_r, 2*bottom_r, h);
             rotate([10, 0,0])
             translate([-top_r, -top_r, bottom_r*0.98])
-            #edges(2*top_r, 2*top_r, h);
+            edges(2*top_r, 2*top_r, h);
             //port holder
-            
-            *difference(){
-                translate([-1, -bottom_r, -bottom_r])
-                cube([2, bottom_r*2, bottom_r/1.5 ]);
+            #difference(){
+                rotate([4,0,0])
+                translate([-1, -bottom_r, -bottom_r])         
+                cube([2, bottom_r*2, bottom_r/1.6 ]);
                 hull(){
                     translate([0,64.6,-37])
                     rotate([angle,0,0])
