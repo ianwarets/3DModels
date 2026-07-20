@@ -151,11 +151,11 @@ module glass_holder(){
     //cube([50,50,100], true);
     cube([40, 40, 120]);
 }
-*difference(){  
+difference(){  
     color("pink") case_cover();
     //cube([40, 40, 120]);
 }
-scale([0.97,0.97,1])
+*scale([0.97,0.97,1])
 sensor_holder();
 *scale([0.995,0.995, 0.995])
 glass_holder();
