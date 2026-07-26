@@ -1,6 +1,7 @@
 include <Round-Anything/polyround.scad>
 $fn=200;
 angle = 100;
+wall_angle = 90-(180-angle);
 minus_angle = angle - 90;
 thickness = 10;
 //outer sizes
@@ -10,21 +11,25 @@ top_r = 60;
 inner_bot_r = bot_r - thickness;
 inner_top_r = top_r - thickness;
 //port
-d = 30;
+Din = 40.5;
+Dout = 22;
+d = 35;
 d2 = d*d;
 d1 = 20;
 D = d2/d1;
-port_l = 120;
-port_str_l = 15;
-port_angle =  36;
+port_l = 163;
+port_str_l = 2;
+port_angle =  128;
+zmove_port = -37;
 
+zmove_tw = 116;
+zmove_w = 25;
 //angle calculations
 angle_tan = tan(180-angle);
 catet = 20/cos(minus_angle) + (bot_r/2)*tan(minus_angle);
 h = catet/tan(minus_angle);
 
 module basic(top_r, bottom_r, thickness){
-    wall_angle = 90-(180-angle);
     module inner_v(top_r, bottom_m, thickness){
         s_top_r = inner_top_r;
         s_bottom_r = inner_bot_r;
@@ -44,7 +49,7 @@ module basic(top_r, bottom_r, thickness){
             cube([w, d, h]);
             translate([w/2, d/3.2,0])
             scale([1.3, 0.8, 1])
-            cylinder(h = h, d1 = w/2.15, d2=w/2);
+            cylinder(h = h, d = w/1.9);
             translate([w/2, d/1.2,0])
             scale([1, 0.8, 1])
             cylinder(h = h, d = w/2);
@@ -70,15 +75,15 @@ module basic(top_r, bottom_r, thickness){
             h = 3;
             inner_v(top_r, bottom_r, thickness);
             union(){
-            rotate([minus_angle, 0,0])
-            translate([-top_r, -top_r, bottom_r*0.9])
+            *rotate([minus_angle-10, 0,0])
+            translate([-top_r, -top_r, bottom_r*0.89])
             edges(2*top_r, 2*top_r, h);
-            rotate([minus_angle+11, 0,0])
-            translate([-bottom_r, -bottom_r, -15])
+            rotate([minus_angle, 0,0])
+            translate([-bottom_r, -bottom_r*1.5, -20])
             edges(2*bottom_r, 2*bottom_r, h);
             
             //port holder
-            #difference(){
+            difference(){
                 rotate([4,0,0])
                 translate([-1, -bottom_r/1.7, -bottom_r])         
                 cube([2, bottom_r*1.5, bottom_r/1.6 ]);
@@ -136,8 +141,8 @@ module woofer_screws(width = 83){
             translate([pos_x, pos_y, 0]){
                 cylinder(h=10, d=4);
                 cylinder(h = 2.6, d1 = 8.2, d2=4);
-                translate([0,0,-4])
-                cylinder(h=4, d = 8.2);
+                translate([0,0,-12])
+                #cylinder(h=12, d = 8.2);
             }
         }
     }   
@@ -199,27 +204,41 @@ module tweeter_screws_holes(thickness, only_cylinder = false){
                 cylinder(h = thickness, d = 3.6);
             if(!only_cylinder){
             cylinder(h = 2.6, d1 = 8.2, d2=4);
-                translate([0,0,-4])
-                cylinder(h=4, d = 8.2);
+                translate([0,0,-10])
+                cylinder(h=10, d = 8.2);
             }
         }            
     }
 }
 module round_port_curved(d, D, l, straight_l, angle){
-    x_factor = D/d;
-    wrap_l = l - straight_l;
-    move = (180/angle)*wrap_l/PI;
-    translate([0,move, straight_l])
-    rotate([90,0,0])
-    rotate([0,-90,0])
-    rotate_extrude(angle = angle, convexity = 10)
-    translate([move,0,0])
-    difference(){
-        resize([d+3, D+3, 0])
-        circle(d = d);
-        resize([d, D, 0])
-        circle(d = d);
+    wrap_l2 = 25;
+    angle_2 = 30;
+    wrap_l1 = l - straight_l - wrap_l2;
+    z_move2 = straight_l;
+    z_move1 = z_move2 + wrap_l2;
+    
+    module curved_part(d, D, angle, wrap_l, z_move, x_angle = 0){
+        move =(180/angle)*wrap_l/PI;
+        //translate([0,move * cos(x_angle), z_move- move*sin(x_angle)])
+        translate([0,move, z_move])
+        rotate([90,0,0])
+        rotate([0,-90,0])
+        rotate_extrude(angle = angle, convexity = 10)
+        translate([move,0,0])
+        difference(){
+            resize([d+3, D+3, 0])
+            circle(d = d);
+            resize([d, D, 0])
+            circle(d = d);
+        }
     }
+    
+    curved_part(d, D, -angle_2, wrap_l2, z_move2);
+    translate([0,-(180/angle_2)*wrap_l2/PI, z_move2])
+    rotate([angle_2,0,0])
+    translate([0,(180/angle_2)*wrap_l2/PI, 0])
+    curved_part(d,D, angle, wrap_l1, 0, -angle_2);
+    
     round_port(d, D, straight_l);
 }
 module round_port(d, D, l){
@@ -239,14 +258,14 @@ module round_port(d, D, l){
         }
     //}
 }
-module port_hole(d, D, l){
-    resize([D+3,d+3,l*2])
+module port_hole(d, D, l = thickness){
+    resize([D+3,d+3,l*3])
         cylinder(h = l*2, d = d);
-    resize([D+7, d+7, 3])
+    *resize([D+7, d+7, 3])
         cylinder(h=3, d = d + 7);
 }
 module terminals(y, z, angle){
-    #rotate([angle, 0,0])
+    rotate([angle, 0,0])
     translate([0,-y,z])
     rotate([90,0,0]){
         cylinder(h=12, d = 12.5, center = true);
@@ -281,60 +300,65 @@ module power_cord_input(y,z,angle){
     rotate([90,90,0])
     polyRoundExtrude(base, 12, 0,0, $fn=10);
 }
+module power_supply(){
+    translate([0,-32,60])
+    rotate([-100,0,0])
+    #translate([-33, -52.5, -18])
+    union(){
+        cube([66, 115, 36]);
+        //56 105
+        for(y = [5,110]){
+            for(x=[5,61]){
+            translate([x,y,-10])
+                difference(){
+                    cylinder(h=10, d = 8);
+                    cylinder(h=10, d = 4.2);
+                }
+            }
+        }
+    }
+}
 module main_case(){
-/*
-    angle_tan = tan(180-angle);
-    catet = 20/cos(10) + (bot_r/2)*tan(10);
-    h = catet/tan(10);
-*/
     difference(){
         basic(top_r, bot_r, thickness);
-        zmove_tw = 116;
-        //translate([0,36,110])
-        //(h-zmove_tw)/angle_tan
-        translate([0,(h-zmove_tw)/angle_tan + bot_r/1.2 - 40/cos(minus_angle),zmove_tw])   
-        
+        //tweeter
+        translate([0,(h-zmove_tw)/angle_tan + bot_r/1.2 - 40/cos(minus_angle),zmove_tw])
         rotate([angle, 0,0])
         translate([0,0,2.6]){
             #tweeter();
             translate([0,0,-6])
             tweeter_screws_holes(thickness+2, true);
             hull()
-            #tweeter_holder(thickness, false);
+            tweeter_holder(thickness, false);
         }
-        
-        zmove_w = 25;
-            translate([0,(h-zmove_w)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_w])
-
+        //woofer
+        translate([0,(h-zmove_w)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_w])
         rotate([angle,0,0])
         rotate([0,0,180])
-        #woofer();
-        translate([0,64.6,-37])
+        woofer();
+        //port    
+        translate([0,(h-zmove_port)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_port])
         rotate([angle, 0, 0])
-        port_hole(20, 45, thickness);
-        terminals(bot_r-thickness+2, 10, -15);
-        *button(-bot_r+thickness, 0, 1);
-        *power_cord_input(-bot_r+thickness+1, 0,14);
+        port_hole(d1, D, thickness);
+        terminals(bot_r-thickness+1, 35, -13);
+        button(-bot_r+thickness, 4, -12);
+        power_cord_input(-bot_r+thickness+1, 3,0);
     }
     //Power supply
-    *translate([57.5,-40,50])
-    rotate([0,80,90])
-    cube([66, 115, 36]);
+    *power_supply();
 }
 module tweeter_circle(circle_h){
     outer_d = 40;
-    //d1= (60-outer_d)/2 + 5;
-    d1=15;
+    d1= (85-outer_d)/2 + 5;
+    //d1=outer_d/2-inner;
     R = outer_d/2 + d1/2;
-    zmove_tw = 116;
     translate([0,(h-zmove_tw)/angle_tan + bot_r/1.2 - 40/cos(minus_angle),zmove_tw])
-    //translate([0,38.6,116.5])
     rotate([angle,0,0]) 
     difference(){
         rotate_extrude(360, 2){
-            translate([R, 0,0])
-                resize([d1, circle_h,0])
+            translate([R, 0,0])           
                 difference(){
+                resize([d1, circle_h*2,0])
                     circle(d=d1);
                     translate([-d1/2,0,0])
                         square([d1, d1/2]);
@@ -345,10 +369,9 @@ module tweeter_circle(circle_h){
     }
 }
 module woofer_circle(circle_h){
-    //d1= (94-73)/2 + 5;
-    d1=15;
+    d1= (114-73)/2 + 5;
     R = 70/2 + d1/2;
-    zmove_w = 25;
+
     translate([0,(h-zmove_w)/angle_tan + bot_r/1.2 - 40/cos(minus_angle),zmove_w])
     //translate([0, 53.65, 25])
     rotate([angle,0,0]) 
@@ -362,10 +385,10 @@ module woofer_circle(circle_h){
                         square([d1, d1/2]);
                 }
         }
-        translate([0,0,-3])
+        translate([0,0,-5])
         woofer_screws();
-        translate([0,0,-4.5])
-        *linear_extrude(height = 2){
+        *translate([0,0,-4.5])
+        linear_extrude(height = 2){
         rotate([180,0,-21])
         revolve_text(73/2+1.5, "ЭЛЕКТРОНИКА", 7, 11);
         rotate([180,0,135])
@@ -374,7 +397,7 @@ module woofer_circle(circle_h){
     }
 }
 module front_pannel(){
-    circle_h = 4.5;
+    circle_h = 15;
 
     module revolve_text(radius, chars, font_size, step_angle) {
         circumference = 2 * PI * radius;
@@ -392,8 +415,18 @@ module front_pannel(){
                     );
         }
     }
-    tweeter_circle(circle_h);
-    woofer_circle(circle_h);
+    tweeter_circel_edge = 4;
+    //difference(){
+        tweeter_circle(tweeter_circel_edge);
+    //}
+    difference(){
+        woofer_circle(circle_h);
+        tweeter_circle(tweeter_circel_edge);
+            translate([0,(h-zmove_port)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_port])
+        rotate([angle, 0, 0])
+        translate([0,0,-13])
+        #port_hole(d1, D, thickness+10);
+    }
 }
 
 module legs(){
@@ -406,16 +439,12 @@ outer_d = 100;
         cylinder(h=h, d1 = inner_d-10, d2 = inner_d-5, center = true);
         }
 }
-
+//rotate([-angle, 0,0])
 difference(){
     union(){
         main_case();
         
-        //phase invertor
-        d = 30;
-        d2 = d*d;
-        d1 = 20;
-        D = d2/d1;
+        //phase inverter
         translate([0,64.6,-37])
             rotate([angle,0,0])
             round_port_curved(d1, D, port_l, port_str_l, angle=port_angle);
@@ -424,9 +453,8 @@ difference(){
     *translate([0,-100,-90])
     cube([100,200,250]);
 }
-*front_pannel();
-wall_angle = 90-(180-angle);
-
+//front pannel
+module front_pannel_decorative(){
 difference(){
     intersection(){
         hull(){
@@ -434,23 +462,49 @@ difference(){
             sphere(r =top_r);
             sphere(r = bot_r);
         }
-        translate([0, bot_r/1.2+0.1, bot_r/2])
+        translate([0, bot_r/1.2, bot_r/2])
         rotate([wall_angle,0,0])
         cube([bot_r*2, 40, (bot_r + top_r)*2], center = true);
     }  
-    translate([0, bot_r/1.2+4.5, bot_r/2])
+    translate([0, bot_r/1.2+3, bot_r/2])
         rotate([wall_angle,0,0])
         cube([bot_r*2, 40, (bot_r + top_r)*2], center = true);
-    hull()
-    tweeter_circle(4.5);
-    hull()
-    woofer_circle(4.5);
-    translate([0,70.1,-37])
+    //tweeter
+    translate([0,(h-zmove_tw)/angle_tan + bot_r/1.2 - 40/cos(minus_angle),zmove_tw])
+    rotate([angle,0,0])
+    translate([0,0,-6.5])
+    cylinder(h=7, d= 70.5);
+    //woofer
+    translate([0,(h-zmove_w)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_w])
+    rotate([angle,0,0])
+    translate([0,0,-6.5])
+    cylinder(h=7, d = 100.5);
+    //port
+    translate([0,(h-zmove_port)/angle_tan+ bot_r/1.2 - 40/cos(minus_angle),zmove_port])
     rotate([angle, 0, 0])
-    #port_hole(20, 45, thickness);
+    translate([0,0,-5])
+    port_hole(d1-3, D-3, thickness);
 } 
+}
+front_pannel();
 
 *difference(){ 
     #legs();
     main_case();
+}
+module t_h(thickness = 10, holes = true){
+h = thickness - 2.4;
+    z_move = -2.61;
+    difference(){
+        translate([0,0,z_move])
+        cylinder(h=h, d = 49.5);
+        tweeter();//holes for screws in box
+        if(holes){
+            for(z=[45:90:315]){
+                rotate([0,0,z])
+                translate([0,28,z_move])
+                cylinder(h = thickness, d = 4);
+            }
+        }
+    }
 }
